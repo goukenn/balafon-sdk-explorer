@@ -20,6 +20,10 @@
         <div v-if="item.namespace" class="doc-header__ns">
           {{ item.namespace }}\{{ item.shortName }}
         </div>
+
+        <div v-if="fileRefs.length" class="doc-header__files">
+          <span v-for="ref in fileRefs" :key="ref" class="doc-header__file">{{ ref }}</span>
+        </div>
       </div>
 
       <DocViewer :type="type" :path="normalizedPath" />
@@ -40,7 +44,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import DocViewer from '../components/DocViewer.vue'
-import { findItem } from '../utils/sdk.js'
+import { findItem, getItemFileRefs } from '../utils/sdk.js'
 
 const { t } = useI18n()
 
@@ -58,4 +62,5 @@ const normalizedPath = computed(() =>
 const typeLabel = computed(() => t(`types.${props.type}`) || props.type)
 
 const item = computed(() => findItem(props.type, normalizedPath.value))
+const fileRefs = computed(() => getItemFileRefs(props.type, normalizedPath.value))
 </script>

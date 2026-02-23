@@ -23,7 +23,7 @@
     </div>
 
     <div v-if="members" class="doc-members">
-      <div v-if="members.funcs && Object.keys(members.funcs).length" class="doc-members__section">
+      <div v-if="sortedFuncs.length" class="doc-members__section">
         <h3 class="doc-members__title">{{ t('doc.members.methods') }}</h3>
         <table class="doc-members__table">
           <thead>
@@ -35,8 +35,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(func, name) in members.funcs" :key="name">
-              <td class="doc-members__name"><code>{{ name }}()</code></td>
+            <tr v-for="func in sortedFuncs" :key="func.name">
+              <td class="doc-members__name"><code>{{ func.name }}()</code></td>
               <td class="doc-members__icon" v-html="modifierHtml(func.modifier)"></td>
               <td class="doc-members__icon" v-html="staticHtml(func.static)"></td>
               <td v-html="func.doc ? renderPhpDocDesc(func.doc) : ''"></td>
@@ -45,7 +45,7 @@
         </table>
       </div>
 
-      <div v-if="members.props && Object.keys(members.props).length" class="doc-members__section">
+      <div v-if="sortedProps.length" class="doc-members__section">
         <h3 class="doc-members__title">{{ t('doc.members.properties') }}</h3>
         <table class="doc-members__table">
           <thead>
@@ -57,8 +57,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(prop, name) in members.props" :key="name">
-              <td class="doc-members__name"><code>{{ name }}</code></td>
+            <tr v-for="prop in sortedProps" :key="prop.name">
+              <td class="doc-members__name"><code>{{ prop.name }}</code></td>
               <td class="doc-members__icon" v-html="modifierHtml(prop.modifier)"></td>
               <td class="doc-members__icon" v-html="staticHtml(prop.static)"></td>
               <td v-html="prop.doc ? renderPhpDocDesc(prop.doc) : ''"></td>
@@ -193,6 +193,22 @@ function staticHtml(isStatic) {
 }
 
 const members = computed(() => getItemMembers(props.type, props.path, lang.value))
+
+// Convert a member dict to a sorted array: non-static α first, then static α
+function sortMembers(/** @type {Record<string,any>|null} */ dict) {
+  if (!dict) return []
+  return Object.entries(dict)
+    .map(([name, data]) => ({ name, ...data }))
+    .sort((a, b) => {
+      const aStatic = !!a.static
+      const bStatic = !!b.static
+      if (aStatic !== bStatic) return aStatic ? 1 : -1
+      return a.name.localeCompare(b.name)
+    })
+}
+
+const sortedFuncs = computed(() => sortMembers(members.value?.funcs ?? null))
+const sortedProps = computed(() => sortMembers(members.value?.props ?? null))
 
 // ─── Doc file fetching ─────────────────────────────────────────────────────
 

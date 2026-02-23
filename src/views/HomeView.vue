@@ -3,6 +3,7 @@
     <div class="home-hero">
       <h1>{{ heroTitle }}</h1>
       <p>{{ heroSubtitle }}</p>
+      <a v-if="meta.url" :href="meta.url" target="_blank" rel="noopener" class="home-hero__url">{{ meta.url }}</a>
     </div>
 
     <div class="home-cards">

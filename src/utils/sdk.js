@@ -7,8 +7,16 @@ export const sdkDataRef = shallowRef(defaultSdkData)
 // Keys that hold typed collections (all start with '::')
 const SPECIAL_KEYS = new Set([
   '::class', '::interface', '::trait',
-  '::namespaces', '::conditionals_functions', '::meta',
+  '::namespaces', '::conditionals_functions', '::meta', '::files',
 ])
+
+// Resolve $r index to a file path from ::files, or null
+function resolveFileRef(/** @type {any} */ entry) {
+  const files = sdkDataRef.value['::files']
+  if (!Array.isArray(files) || !entry || typeof entry !== 'object') return null
+  const idx = entry['$r']
+  return (typeof idx === 'number' && idx >= 0 && idx < files.length) ? files[idx] : null
+}
 
 // ─── Name helpers ─────────────────────────────────────────────────────────────
 
@@ -70,14 +78,32 @@ export function getItems(type) {
   const dict = getRawDict(type)
   return Object.keys(dict).map(fullName => {
     const { namespace, shortName } = parseName(fullName)
+    const val = /** @type {any} */ (dict)[fullName]
+    // Resolve primary file ref from $r (use first element if array)
+    const firstEntry = Array.isArray(val) ? val[0] : val
+    const fileRef = resolveFileRef(firstEntry)
     return {
       fullName,
       shortName,
       namespace,
       path: nameToPath(fullName),
       type,
+      fileRef,
     }
   }).sort((a, b) => a.fullName.localeCompare(b.fullName))
+}
+
+// Return all source file paths for an item (array because a function can be defined in multiple files)
+export function getItemFileRefs(type, path) {
+  const fullName = pathToName(path)
+  const dict = /** @type {Record<string, any>} */ (getRawDict(type))
+  const val = dict[fullName]
+  if (!val || typeof val !== 'object') return []
+  if (Array.isArray(val)) {
+    return val.map(e => resolveFileRef(e)).filter(Boolean)
+  }
+  const ref = resolveFileRef(val)
+  return ref ? [ref] : []
 }
 
 // Build a namespace tree for the sidebar
@@ -103,8 +129,14 @@ export function buildNamespaceTree(type) {
 }
 
 // Get framework metadata
+/**
+ * 
+ * @returns {framework:string, versions:string[], url:string, description:string}
+ */
 export function getMeta() {
-  return sdkDataRef.value['::meta'] || { framework: 'Balafon', versions: ['1.0'] }
+  return sdkDataRef.value['::meta'] || { 
+    framework: 'Balafon', versions: ['1.0'] 
+  }
 }
 
 // Get item counts for all categories
@@ -131,8 +163,17 @@ export function findItem(type, path) {
 
 // Pick the best doc string from an entry for the given language.
 // Looks for "doc.{lang}" first (e.g. "doc.fr"), falls back to "doc".
+// If entry is an array (multiple definitions per ::files), picks the first one that has a doc.
 function pickDoc(/** @type {any} */ entry, /** @type {string} */ lang) {
-  if (!entry || typeof entry !== 'object') return null
+  if (!entry) return null
+  if (Array.isArray(entry)) {
+    for (const e of entry) {
+      const d = pickDoc(e, lang)
+      if (d) return d
+    }
+    return null
+  }
+  if (typeof entry !== 'object') return null
   const langKey = `doc.${lang}`
   if (lang && lang !== 'en' && typeof entry[langKey] === 'string') return entry[langKey]
   return typeof entry.doc === 'string' ? entry.doc : null

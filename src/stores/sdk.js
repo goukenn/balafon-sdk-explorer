@@ -13,15 +13,20 @@ function extractData(/** @type {any} */ mod) {
   return mod.default ?? mod
 }
 
+function labelFromData(/** @type {any} */ data, /** @type {string} */ fallback) {
+  const meta = data?.['::meta']
+  return meta?.title ?? meta?.framework ?? fallback
+}
+
 const SDK_LIST = [
-  ...Object.entries(defaultModules).map(([, mod]) => ({
-    id: 'default',
-    label: 'Default',
-    data: extractData(mod),
-  })),
+  ...Object.entries(defaultModules).map(([, mod]) => {
+    const data = extractData(mod)
+    return { id: 'default', label: labelFromData(data, 'Default'), data }
+  }),
   ...Object.entries(extraModules).map(([path, mod]) => {
     const id = path.match(/\/([^/]+)\.sdk\.json$/)?.[1] ?? path
-    return { id, label: id, data: extractData(mod) }
+    const data = extractData(mod)
+    return { id, label: labelFromData(data, id), data }
   }),
 ]
 

@@ -557,6 +557,18 @@ a:hover {
   color: var(--text-muted);
   max-width: 600px;
 }
+.home-hero__url {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--accent);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.home-hero__url:hover {
+  text-decoration: underline;
+  opacity: 1;
+}
 
 .home-cards {
   display: grid;
@@ -671,6 +683,22 @@ a:hover {
   color: var(--text-muted);
   font-family: 'SFMono-Regular', Consolas, monospace;
   margin-top: 0.25rem;
+}
+
+.doc-header__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+.doc-header__file {
+  font-size: 0.75rem;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  color: var(--text-muted);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.5em;
 }
 
 /* =========================================================
