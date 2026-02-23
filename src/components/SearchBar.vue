@@ -68,15 +68,15 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRouter } from 'vue-router'
-import { search, TOTAL_COUNT } from '../composables/useSearch.js'
+import { useSearch } from '../composables/useSearch.js'
 
 const { t } = useI18n()
+const { search, totalCount } = useSearch()
 const router = useRouter()
 const inputEl = ref(null)
 const query = ref('')
 const isOpen = ref(false)
 const activeKey = ref(null)
-const totalCount = TOTAL_COUNT
 
 const results = computed(() => search(query.value))
 
