@@ -341,7 +341,8 @@ a:hover {
   border-color: var(--accent);
 }
 
-/* ─── Language selector ────────────────────────────── */
+/* ─── SDK selector + Language selector (shared style) ── */
+.topnav__sdk,
 .topnav__lang {
   display: flex;
   align-items: center;
@@ -356,6 +357,7 @@ a:hover {
   line-height: 1;
 }
 
+.topnav__sdk select,
 .topnav__lang select {
   background: var(--code-bg);
   color: var(--text);
@@ -371,6 +373,7 @@ a:hover {
   background-position: right 0.4rem center;
 }
 
+.topnav__sdk select:hover,
 .topnav__lang select:hover {
   border-color: var(--accent);
 }
@@ -580,6 +583,15 @@ a:hover {
   transform: translateY(-1px);
   text-decoration: none;
   color: var(--text);
+}
+.home-card--empty {
+  opacity: 0.45;
+  cursor: default;
+}
+.home-card--empty:hover {
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
 }
 
 .home-card__icon {

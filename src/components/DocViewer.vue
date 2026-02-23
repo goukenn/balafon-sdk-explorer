@@ -16,9 +16,9 @@
       <div class="doc-empty__icon">📄</div>
       <div class="doc-empty__title">{{ t('doc.empty.title') }}</div>
       <p class="doc-empty__text">
-        Add a file at <code>public/docs/{{ type }}/{{ path }}.md</code> or
-        <code>public/docs/{{ type }}/{{ path }}.html</code> to provide documentation.<br>
-        For translated content, use <code>public/docs/{{ type }}/{{ path }}.fr.md</code>, etc.
+        Add a file at <code>public/docs/{{ docPrefix }}{{ type }}/{{ path }}.md</code> or
+        <code>public/docs/{{ docPrefix }}{{ type }}/{{ path }}.html</code> to provide documentation.<br>
+        For translated content, use <code>public/docs/{{ docPrefix }}{{ type }}/{{ path }}.fr.md</code>, etc.
       </p>
     </div>
 
@@ -75,6 +75,7 @@ import { ref, watch, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
 import { useLang } from '../composables/useLang.js'
+import { useSdk } from '../composables/useSdk.js'
 import { getItemDoc, getItemMembers } from '../utils/sdk.js'
 
 const { t } = useI18n()
@@ -85,6 +86,10 @@ const props = defineProps({
 })
 
 const { lang } = useLang()
+const { currentSdkId } = useSdk()
+
+// "default" SDK → /docs/{type}/{path}  |  other SDKs → /docs/{sdkId}/{type}/{path}
+const docPrefix = computed(() => currentSdkId.value === 'default' ? '' : `${currentSdkId.value}/`)
 
 const loading = ref(false)
 const content = ref(null)
@@ -218,7 +223,7 @@ async function loadDoc() {
   isMd.value = false
   renderedMd.value = ''
 
-  const basePath = `/docs/${props.type}/${props.path}`
+  const basePath = `/docs/${docPrefix.value}${props.type}/${props.path}`
   const currentLang = lang.value
 
   try {
@@ -281,8 +286,8 @@ async function loadDoc() {
 }
 
 onMounted(loadDoc)
-// Reload when route changes OR language changes
-watch(() => [props.type, props.path, lang.value], loadDoc)
+// Reload when route, language, or active SDK changes
+watch(() => [props.type, props.path, lang.value, currentSdkId.value], loadDoc)
 </script>
 
 <style scoped>

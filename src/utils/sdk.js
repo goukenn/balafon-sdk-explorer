@@ -1,4 +1,8 @@
-import sdkData from '../data/sdk.json'
+import { shallowRef } from 'vue'
+import defaultSdkData from '../data/sdk.json'
+
+// Reactive SDK data — swap this ref to switch the active SDK at runtime
+export const sdkDataRef = shallowRef(defaultSdkData)
 
 // Keys that hold typed collections (all start with '::')
 const SPECIAL_KEYS = new Set([
@@ -34,9 +38,10 @@ export function pathToName(path) {
 
 // Global functions: all top-level keys that do NOT start with '::'
 function getRawFunctions() {
+  const data = sdkDataRef.value
   const result = {}
-  for (const key of Object.keys(sdkData)) {
-    if (!SPECIAL_KEYS.has(key)) result[key] = /** @type {any} */ (sdkData)[key]
+  for (const key of Object.keys(data)) {
+    if (!SPECIAL_KEYS.has(key)) result[key] = /** @type {any} */ (data)[key]
   }
   return result
 }
@@ -44,13 +49,14 @@ function getRawFunctions() {
 // Map type string → raw name dict
 // The new JSON format emits [] for empty typed collections — normalize to {}
 function getRawDict(type) {
+  const data = sdkDataRef.value
   let raw
   switch (type) {
-    case 'class':                raw = sdkData['::class']; break
-    case 'interface':            raw = sdkData['::interface']; break
-    case 'trait':                raw = sdkData['::trait']; break
+    case 'class':                raw = data['::class']; break
+    case 'interface':            raw = data['::interface']; break
+    case 'trait':                raw = data['::trait']; break
     case 'function':             return getRawFunctions()
-    case 'conditional_function': raw = sdkData['::conditionals_functions']; break
+    case 'conditional_function': raw = data['::conditionals_functions']; break
     default:                     return {}
   }
   if (!raw || Array.isArray(raw)) return {}
@@ -71,7 +77,7 @@ export function getItems(type) {
       path: nameToPath(fullName),
       type,
     }
-  }).sort((a, b) => a.shortName.localeCompare(b.shortName))
+  }).sort((a, b) => a.fullName.localeCompare(b.fullName))
 }
 
 // Build a namespace tree for the sidebar
@@ -98,18 +104,19 @@ export function buildNamespaceTree(type) {
 
 // Get framework metadata
 export function getMeta() {
-  return sdkData['::meta'] || { framework: 'Balafon', versions: ['1.0'] }
+  return sdkDataRef.value['::meta'] || { framework: 'Balafon', versions: ['1.0'] }
 }
 
 // Get item counts for all categories
 export function getCounts() {
+  const data = sdkDataRef.value
   const rawFns = getRawFunctions()
   return {
-    class:                Object.keys(sdkData['::class'] || {}).length,
-    interface:            Object.keys(sdkData['::interface'] || {}).length,
-    trait:                Object.keys(sdkData['::trait'] || {}).length,
+    class:                Object.keys(data['::class'] || {}).length,
+    interface:            Object.keys(data['::interface'] || {}).length,
+    trait:                Object.keys(data['::trait'] || {}).length,
     function:             Object.keys(rawFns).length,
-    conditional_function: Object.keys(sdkData['::conditionals_functions'] || {}).length,
+    conditional_function: Object.keys(data['::conditionals_functions'] || {}).length,
   }
 }
 

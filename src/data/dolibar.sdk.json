@@ -1,0 +1,26 @@
+{
+    "::class": {
+        "yaa":{
+        },
+        "zaa":{
+        },
+        "bb":{
+        },
+        "cc":{
+        },
+        "aa":{
+        }
+    },
+    "::trait": {
+        "atrait":{
+        }
+    },
+    "::interface": {
+        "isample":{
+        }
+    },
+    "::meta":{
+        "framework":"dolibar",
+        "description":"dolibar framework description"
+    }
+}
