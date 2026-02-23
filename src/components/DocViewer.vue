@@ -152,7 +152,7 @@ function renderPhpDoc(docString) {
 }
 
 const phpDocHtml = computed(() => {
-  const docStr = getItemDoc(props.type, props.path)
+  const docStr = getItemDoc(props.type, props.path, lang.value)
   return docStr ? renderPhpDoc(docStr) : null
 })
 
@@ -187,7 +187,7 @@ function staticHtml(isStatic) {
   return isStatic ? SVG_STATIC : ''
 }
 
-const members = computed(() => getItemMembers(props.type, props.path))
+const members = computed(() => getItemMembers(props.type, props.path, lang.value))
 
 // ─── Doc file fetching ─────────────────────────────────────────────────────
 

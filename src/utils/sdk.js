@@ -122,22 +122,45 @@ export function findItem(type, path) {
   return { fullName, shortName, namespace, path, type }
 }
 
-// Return the inline PHPDoc string for an item, or null if not present
-export function getItemDoc(type, path) {
+// Pick the best doc string from an entry for the given language.
+// Looks for "doc.{lang}" first (e.g. "doc.fr"), falls back to "doc".
+function pickDoc(/** @type {any} */ entry, /** @type {string} */ lang) {
+  if (!entry || typeof entry !== 'object') return null
+  const langKey = `doc.${lang}`
+  if (lang && lang !== 'en' && typeof entry[langKey] === 'string') return entry[langKey]
+  return typeof entry.doc === 'string' ? entry.doc : null
+}
+
+// Return the inline PHPDoc string for an item, or null if not present.
+// Pass lang (e.g. 'fr') to prefer "doc.fr" over "doc".
+export function getItemDoc(type, path, lang = 'en') {
   const fullName = pathToName(path)
   const dict = /** @type {Record<string, any>} */ (getRawDict(type))
   const val = dict[fullName]
-  return (val && typeof val === 'object' && typeof val.doc === 'string') ? val.doc : null
+  return pickDoc(val, lang)
 }
 
-// Return { funcs, props } for a class/interface/trait entry, or null if neither is present
-export function getItemMembers(type, path) {
+// Return { funcs, props } for a class/interface/trait entry, or null if neither is present.
+// Each member's "doc" field is resolved to the best available language string.
+export function getItemMembers(type, path, lang = 'en') {
   const fullName = pathToName(path)
   const dict = /** @type {Record<string, any>} */ (getRawDict(type))
   const val = dict[fullName]
   if (!val || typeof val !== 'object') return null
-  const funcs = (val.funcs && typeof val.funcs === 'object' && !Array.isArray(val.funcs)) ? val.funcs : null
-  const props = (val.props && typeof val.props === 'object' && !Array.isArray(val.props)) ? val.props : null
-  if (!funcs && !props) return null
+  const rawFuncs = (val.funcs && typeof val.funcs === 'object' && !Array.isArray(val.funcs)) ? val.funcs : null
+  const rawProps = (val.props && typeof val.props === 'object' && !Array.isArray(val.props)) ? val.props : null
+  if (!rawFuncs && !rawProps) return null
+
+  function normalizeMember(/** @type {any} */ member) {
+    if (!member || typeof member !== 'object') return member
+    return { ...member, doc: pickDoc(member, lang) }
+  }
+
+  const funcs = rawFuncs
+    ? Object.fromEntries(Object.entries(rawFuncs).map(([k, v]) => [k, normalizeMember(v)]))
+    : null
+  const props = rawProps
+    ? Object.fromEntries(Object.entries(rawProps).map(([k, v]) => [k, normalizeMember(v)]))
+    : null
   return { funcs, props }
 }
