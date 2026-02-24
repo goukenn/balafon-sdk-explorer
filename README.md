@@ -1,12 +1,11 @@
 # balafon-php-sdk-viewer
 
 
-# Wiki : Format du fichier de Schema JSON - SDK CodeIgniter 4
+# Wiki : Format du fichier de Schema JSON - SDK 
 
 **Auteur :** C.A.D BONDJE DOUE
 **Date :** 2026-02-24
 **Version :** 1.0
-**Framework :** CodeIgniter 4.0
 
 ---
 
@@ -46,7 +45,7 @@
 
 ## 1. Introduction
 
-Le fichier de schema JSON du **SDK CodeIgniter 4** est un fichier de description structurel exhaustif qui documente l'architecture complete d'un framework PHP. Il encode en JSON :
+Le fichier de schema JSON du **SDK ** est un fichier de description structurel exhaustif qui documente l'architecture complete d'un framework PHP. Il encode en JSON :
 
 - toutes les **classes** avec leurs methodes et proprietes,
 - toutes les **interfaces** et leur contrat,
@@ -88,31 +87,25 @@ Les cles prefixees par `::` sont **reservees** pour la configuration. Toutes les
 
 ## 3. Statistiques du SDK
 
-Le fichier `codeigniter4_sdk.json` decrit le SDK CodeIgniter 4.0 avec les caracteristiques suivantes :
+Le fichier `sdk.json` decrit le SDK .0 avec les caracteristiques suivantes :
 
 ```
 +---------------------------+--------+
 | Element                   | Nombre |
 +---------------------------+--------+
-| Classes                   |    520 |
-| Interfaces                |     59 |
-| Traits                    |     24 |
-| Namespaces                |    122 |
-| Fichiers sources          |    693 |
-| Fonctions globales        |     77 |
-| Fonctions conditionnelles |    193 |
-| Methodes (total)          |   3234 |
+| Classes                   |    x   |
+| Interfaces                |    x   |
+| Traits                    |    x   |
+| Namespaces                |    x   |
+| Fichiers sources          |    x   |
+| Fonctions globales        |    x   |
+| Fonctions conditionnelles |    x   |
+| Methodes (total)          |   TOTAL|
 +---------------------------+--------+
 ```
 
 **Namespaces de premier niveau presents :**
-- `App` - Controllers et classes applicatives
-- `CodeIgniter` - Coeur du framework
-- `Config` - Classes de configuration
-- `Kint` - Outil de debug
-- `Laminas` - Composants Laminas integres
-- `Psr` - Interfaces PSR standardisees
-- `Tests` - Classes de support pour les tests
+
 
 ---
 
@@ -162,7 +155,7 @@ Dictionnaire de toutes les **interfaces PHP** du SDK. Comme les classes, les int
 
 ```json
 "::interface": {
-    "CodeIgniter\\Cache\\CacheInterface": {
+    "Cache\\CacheInterface": {
         "doc": "/** PHPDoc de l'interface */",
         "type": "interface",
         "$r": 58,
@@ -183,7 +176,7 @@ Dictionnaire de tous les **traits PHP** du SDK. Les traits peuvent contenir des 
 
 ```json
 "::trait": {
-    "CodeIgniter\\API\\ResponseTrait": {
+    "API\\ResponseTrait": {
         "doc": "/** PHPDoc du trait */",
         "type": "trait",
         "$r": 634,
@@ -216,13 +209,13 @@ Dictionnaire de fonctions dont la **disponibilite est conditionnelle** selon l'e
 
 Les cles peuvent etre :
 - un **nom simple** (fonction sans namespace) : `"_from_random"`
-- un **nom avec namespace** : `"CodeIgniter\\Files\\fromString"`
+- un **nom avec namespace** : `"Files\\fromString"`
 
 **Exemple issu du SDK :**
 
 ```json
 "::conditionals_functions": {
-    "CodeIgniter\\Files\\fromString": {
+    "Files\\fromString": {
         "doc": "/** Allows the creation of a FileSizeUnit from Strings like \"kb\" */",
         "$r": 396,
         "params": [
@@ -256,7 +249,7 @@ Tableau de tous les **fichiers PHP sources** associes au SDK. Les chemins sont r
 ]
 ```
 
-Le SDK CodeIgniter 4 referencie **693 fichiers** dans cette liste.
+Le SDK  referencie **un certains nombre de fichiers**.
 
 ---
 
@@ -268,15 +261,11 @@ Tableau de tous les **espaces de noms PHP** declares dans le SDK.
 
 ```json
 "::namespaces": [
-    "CodeIgniter",
-    "CodeIgniter\\View",
-    "CodeIgniter\\View\\Exceptions",
-    "Tests\\Support",
-    "Tests\\Support\\Models"
+   // les espaces de nom déclarés
 ]
 ```
 
-Les namespaces sont listes individuellement, y compris les sous-namespaces. Le SDK CodeIgniter 4 en declare **122**.
+Les namespaces sont listes individuellement, y compris les sous-namespaces. Le SDK  en declare **122**.
 
 ---
 
@@ -288,9 +277,9 @@ Metadonnees descriptives du SDK ou du projet.
 
 ```json
 "::meta": {
-    "framework": "codeigniter4",
-    "url": "https://codeigniter.com/download",
-    "versions": ["4.0"]
+    "framework": "nom_du_framework",
+    "url": "url_de_telechargement",
+    "versions": ["version"]
 }
 ```
 
@@ -315,7 +304,7 @@ Metadonnees descriptives du SDK ou du projet.
 Toutes les cles possibles d'une definition de classe :
 
 ```json
-"CodeIgniter\\Cache\\CacheFactory": {
+"Cache\\CacheFactory": {
     "doc": "/** PHPDoc complet de la classe */",
     "type": "class",
     "$r": 127,
@@ -407,7 +396,7 @@ Les interfaces suivent la meme structure que les classes mais avec `"type": "int
 
 ```json
 "::interface": {
-    "CodeIgniter\\API\\TransformerInterface": {
+    "API\\TransformerInterface": {
         "doc": "/**\n * Interface for transforming resources into arrays.\n */",
         "type": "interface",
         "$r": 635,
@@ -444,7 +433,7 @@ Les traits utilisent `"type": "trait"` et peuvent avoir a la fois `funcs` et `pr
 
 ```json
 "::trait": {
-    "CodeIgniter\\API\\ResponseTrait": {
+    "ResponseTrait": {
         "doc": "/**\n * Provides HTTP response methods for APIs.\n * @property IncomingRequest $request\n */",
         "type": "trait",
         "$r": 634,
@@ -483,7 +472,7 @@ Les fonctions globales sont definies comme **cles ordinaires** a la racine du fi
 **Exemple :**
 
 ```json
-"CodeIgniter\\CLI\\beep": {
+"CLI\\beep": {
     "doc": "/**\n * Beeps a certain number of times.\n * @param int $num\n * @return void\n */",
     "$r": 621,
     "params": [
@@ -517,7 +506,7 @@ Elles partagent la meme structure que les fonctions globales :
 
 ```json
 "::conditionals_functions": {
-    "CodeIgniter\\Files\\fromString": {
+    "Files\\fromString": {
         "doc": "/** Creates a FileSizeUnit from a string like 'kb' or 'mb' */",
         "$r": 396,
         "params": [{ "name": "$unit", "type": "string" }],
@@ -634,7 +623,7 @@ La propriete `static` (boolean) marque une methode comme statique. Elle est abse
 }
 ```
 
-Le SDK CodeIgniter 4 contient **429 methodes statiques**.
+Le SDK  contient **429 methodes statiques**.
 
 ---
 
@@ -673,7 +662,7 @@ Le champ `$r` est un **index numerique** qui pointe directement vers l'entree co
 element[$r]  ->  ::files[$r]  ->  chemin du fichier PHP
 ```
 
-**Verification sur le SDK CodeIgniter 4 :**
+**Verification sur le SDK  :**
 
 ```
 +-----+-------------------------------------------+----------------------------------+
@@ -702,13 +691,13 @@ element[$r]  ->  ::files[$r]  ->  chemin du fichier PHP
     "./system/API/ResponseTrait.php"
 ],
 "::class": {
-    "CodeIgniter\\API\\ApiException": {
+    "API\\ApiException": {
         "type": "class",
         "$r": 0
     }
 },
 "::trait": {
-    "CodeIgniter\\API\\ResponseTrait": {
+    "API\\ResponseTrait": {
         "type": "trait",
         "$r": 2
     }
@@ -726,7 +715,7 @@ Ici, `$r: 0` signifie que `ApiException` est definie dans `::files[0]`, et `$r: 
 Les elements PHP sont identifies par leur **nom complet qualifie (FQN)** avec les backslashes PHP (`\`) :
 
 ```
-"CodeIgniter\\Database\\Exceptions\\DatabaseException"
+"Database\\Exceptions\\DatabaseException"
       |              |                    |
   namespace     sous-namespace        nom de la classe
 ```
@@ -736,7 +725,7 @@ Les elements PHP sont identifies par leur **nom complet qualifie (FQN)** avec le
 Les fonctions globales combinent le **namespace + nom de la fonction** dans la cle :
 
 ```
-"CodeIgniter\\CLI\\beep"
+"CLI\\beep"
       |         |    |
   namespace  module  nom
 ```
@@ -823,7 +812,7 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 
 ```json
 "::class": {
-    "CodeIgniter\\API\\ApiException": {
+    "API\\ApiException": {
         "doc": "/** Custom exception for API-related errors. */",
         "type": "class",
         "$r": 632,
@@ -876,7 +865,7 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 
 ```json
 "::trait": {
-    "CodeIgniter\\API\\ResponseTrait": {
+    "API\\ResponseTrait": {
         "doc": "/** Provides HTTP response helpers for API controllers. */",
         "type": "trait",
         "$r": 634,
@@ -908,7 +897,7 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 
 ```json
 "::interface": {
-    "CodeIgniter\\Cache\\CacheInterface": {
+    "Cache\\CacheInterface": {
         "doc": "/** Interface that defines all CacheHandler requirements. */",
         "type": "interface",
         "$r": 58,
@@ -937,12 +926,12 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 
 ```json
 {
-    "CodeIgniter\\CLI\\beep": {
+    "CLI\\beep": {
         "doc": "/**\n * Beeps a certain number of times.\n * @param int $num\n * @return void\n */",
         "$r": 621,
         "params": [{ "name": "$num", "type": "int" }]
     },
-    "CodeIgniter\\CLI\\color": {
+    "CLI\\color": {
         "doc": "/** Outputs a string formatted for the CLI with color and styling. */",
         "$r": 621,
         "params": [
