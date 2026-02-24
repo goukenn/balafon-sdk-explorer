@@ -473,55 +473,60 @@ a:hover {
   padding: 0 0 0.25rem;
 }
 
-/* Namespace group header */
-.sidenav__ns {
-  padding: 0.25rem 0.75rem 0.125rem 1.125rem;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  user-select: none;
-}
-.sidenav__ns:hover { color: var(--text); }
-.sidenav__ns .toggle-icon {
-  font-size: 0.65rem;
-  transition: transform 0.2s;
-}
-.sidenav__ns .toggle-icon.open { transform: rotate(90deg); }
-
-/* Leaf item */
+/* Namespace group header + leaf items — shared select-like style */
+.sidenav__ns,
 .sidenav__item {
-  display: block;
-  padding: 0.25rem 0.75rem 0.25rem 1.75rem;
+  margin: 0.125rem 0.5rem 0.125rem calc(0.5rem + var(--depth, 0) * 0.75rem);
+  width: calc(100% - 1rem - var(--depth, 0) * 0.75rem);
+  padding: 0.25rem 0.5rem 0.25rem 0.625rem;
   font-size: 0.8125rem;
-  color: var(--text-muted);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
   text-decoration: none;
-  border-radius: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color 0.1s, background 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   line-height: 1.5;
+  box-sizing: border-box;
 }
+
+/* Namespace toggle button extras */
+.sidenav__ns {
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  text-align: left;
+}
+.sidenav__ns:hover { border-color: var(--accent); color: var(--accent); }
+.sidenav__ns .toggle-icon {
+  font-size: 0.65rem;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+a.sidenav__item{
+  --border:0;
+}
+.sidenav__ns .toggle-icon.open { transform: rotate(90deg); }
+
+/* Leaf item extras */
 .sidenav__item:hover {
-  color: var(--text);
-  background: var(--sidebar-hover);
+  border-color: var(--accent);
+  color: var(--accent);
   text-decoration: none;
 }
 .sidenav__item.router-link-active,
 .sidenav__item.active {
-  color: var(--sidebar-active-text);
+  border-color: var(--accent);
+  color: var(--accent);
   background: var(--sidebar-active-bg);
   font-weight: 600;
-}
-
-/* Items under a namespace get more indent */
-.sidenav__ns-children .sidenav__item {
-  padding-left: 2.25rem;
 }
 
 /* =========================================================

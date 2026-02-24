@@ -6,6 +6,7 @@
       :key="item.fullName"
       :to="`/${type}/${item.path}`"
       class="sidenav__item"
+      :style="{ '--depth': 0 }"
     >{{ item.shortName }}</RouterLink>
   </template>
 
@@ -14,7 +15,7 @@
     <div v-for="nsKey in childKeys" :key="nsKey" class="sidenav__ns-group">
       <button
         class="sidenav__ns"
-        :style="{ paddingLeft: `${1.125 + depth * 0.75}rem` }"
+        :style="{ '--depth': depth }"
         @click="toggleNs(nsKey)"
       >
         <span class="toggle-icon" :class="{ open: openNs[nsKey] }">▶</span>
@@ -28,7 +29,7 @@
           :key="item.fullName"
           :to="`/${type}/${item.path}`"
           class="sidenav__item"
-          :style="{ paddingLeft: `${2.25 + depth * 0.75}rem` }"
+          :style="{ '--depth': depth + 1 }"
         >{{ item.shortName }}</RouterLink>
 
         <!-- Recurse into deeper namespaces -->
