@@ -1,8 +1,22 @@
 {
   "name": "balafon-php-sdk-viewer",
-  "private": true,
+  "private": false,
   "version": "1.0.0",
   "type": "module",
+  "license":"MIT",
+  "description": "php sdk viewer",
+  "keywords": [
+    "balafon",
+    "igkdev",
+    "sdk",
+    "viewer",
+    "php",
+    "C.A.D BONDJE DOUE"
+  ],
+  "author": {
+    "name": "C.A.D BONDJE DOUE",
+    "email": "cbondje@igkdev.com"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
