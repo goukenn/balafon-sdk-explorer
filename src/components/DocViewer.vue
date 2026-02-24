@@ -51,7 +51,7 @@
           </thead>
           <tbody>
             <tr v-for="func in sortedFuncs" :key="func.name">
-              <td class="doc-members__name"><code>{{ func.name }}()</code></td>
+              <td class="doc-members__name"><code v-html="renderSignatureHtml(func.name, func.params, func.return)"></code></td>
               <td class="doc-members__icon" v-html="modifierHtml(func.modifier)"></td>
               <td class="doc-members__icon" v-html="staticHtml(func.static)"></td>
               <td v-html="func.doc ? renderPhpDocDesc(func.doc) : ''"></td>
@@ -91,7 +91,7 @@ import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
 import { useLang } from '../composables/useLang.js'
 import { useSdk } from '../composables/useSdk.js'
-import { getItemDefinitions } from '../utils/sdk.js'
+import { getItemDefinitions, renderSignatureHtml } from '../utils/sdk.js'
 
 const { t } = useI18n()
 

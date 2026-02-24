@@ -161,6 +161,14 @@ export function findItem(type, path) {
   return { fullName, shortName, namespace, path, type }
 }
 
+// Return true when the interface has no methods across all its definitions.
+export function getItemIsContract(type, path) {
+  if (type !== 'interface') return false
+  const defs = getItemDefinitions(type, path)
+  if (defs.length === 0) return false
+  return defs.every(def => !def.funcs || Object.keys(def.funcs).length === 0)
+}
+
 // Return true when the item has exactly one definition and it is marked is_conditional.
 export function getItemIsConditional(type, path) {
   const fullName = pathToName(path)
@@ -235,6 +243,8 @@ export function getItemDefinitions(type, path, lang = 'en') {
       is_conditional: !!entry.is_conditional,
       modifier: entry.modifier ?? null,
       doc: pickDoc(entry, lang),
+      params: Array.isArray(entry.params) ? entry.params : null,
+      returnType: (typeof entry.return === 'string' && entry.return) ? entry.return : null,
       funcs: rawFuncs ? Object.fromEntries(Object.entries(rawFuncs).map(([k, v]) => [k, normalizeMember(v)])) : null,
       props: rawProps ? Object.fromEntries(Object.entries(rawProps).map(([k, v]) => [k, normalizeMember(v)])) : null,
     }
@@ -247,4 +257,88 @@ export function getItemMembers(type, path, lang = 'en', defIndex = 0) {
   const def = defs[defIndex] ?? defs[0]
   if (!def || (!def.funcs && !def.props)) return null
   return { funcs: def.funcs, props: def.props }
+}
+
+// Return the return type for an item when there is exactly one definition, or null.
+export function getItemReturn(type, path) {
+  const fullName = pathToName(path)
+  const dict = /** @type {Record<string, any>} */ (getRawDict(type))
+  const val = dict[fullName]
+  if (!val || typeof val !== 'object') return null
+  const raw = Array.isArray(val) ? (val.length === 1 ? val[0].return : null) : val.return
+  return (typeof raw === 'string' && raw) ? raw : null
+}
+
+// Return the params array for an item when there is exactly one definition, or null.
+export function getItemParams(type, path) {
+  const fullName = pathToName(path)
+  const dict = /** @type {Record<string, any>} */ (getRawDict(type))
+  const val = dict[fullName]
+  if (!val || typeof val !== 'object') return null
+  if (Array.isArray(val)) {
+    return val.length === 1 ? (Array.isArray(val[0].params) ? val[0].params : null) : null
+  }
+  return Array.isArray(val.params) ? val.params : null
+}
+
+// ─── Parameter formatting helpers ─────────────────────────────────────────────
+
+export function formatParam(/** @type {any} */ param) {
+  if (typeof param === 'string') return param
+  if (!param || typeof param !== 'object') return ''
+  let s = ''
+  if (param.type) s += `${param.type} `
+  s += param.name ?? ''
+  if ('default' in param) s += `=${param.default}`
+  return s
+}
+
+export function formatParams(/** @type {any[]|null|undefined} */ params) {
+  if (!Array.isArray(params) || params.length === 0) return ''
+  return params.map(formatParam).join(', ')
+}
+
+// ─── Signature HTML rendering (colorized) ────────────────────────────────────
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function defaultValueClass(val) {
+  if (typeof val === 'number') return 'sig-number'
+  const s = String(val).trim()
+  if (s === 'null' || s === 'true' || s === 'false') return 'sig-keyword'
+  if (/^["']/.test(s)) return 'sig-string'
+  if (/^-?\d+(\.\d+)?$/.test(s)) return 'sig-number'
+  return null
+}
+
+function renderParamHtml(/** @type {any} */ param) {
+  if (typeof param === 'string') return `<span class="sig-param">${escHtml(param)}</span>`
+  if (!param || typeof param !== 'object') return ''
+  let s = ''
+  if (param.type) s += `<span class="sig-type">${escHtml(param.type)}</span> `
+  s += `<span class="sig-param">${escHtml(param.name ?? '')}</span>`
+  if ('default' in param) {
+    const cls = defaultValueClass(param.default)
+    const val = escHtml(String(param.default))
+    s += cls ? ` = <span class="${cls}">${val}</span>` : ` = ${val}`
+  }
+  return s
+}
+
+// Render a PHP-style function signature as colorized HTML.
+// returnType is suppressed when null or "void".
+export function renderSignatureHtml(/** @type {string} */ name, /** @type {any[]|null|undefined} */ params, /** @type {string|null|undefined} */ returnType) {
+  const paramsHtml = Array.isArray(params) && params.length
+    ? params.map(renderParamHtml).join(', ')
+    : ''
+  let html = `${escHtml(name ?? '')}(${paramsHtml})`
+  if (returnType && returnType !== 'void') {
+    html += `: <span class="sig-type">${escHtml(returnType)}</span>`
+  }
+  return html
 }

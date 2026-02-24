@@ -17,7 +17,12 @@
           <span class="doc-header__badge" :class="`badge--${type}`">{{ typeLabel }}</span>
           <span v-if="modifier" class="doc-header__badge" :class="`badge--${modifier}`">{{ modifier }}</span>
           <span v-if="isConditional" class="doc-header__badge badge--conditional">conditional</span>
+          <span v-if="isContract" class="doc-header__badge badge--contract">contract</span>
         </h1>
+
+        <div v-if="params && params.length" class="doc-header__signature">
+          <code v-html="signatureHtml"></code>
+        </div>
 
         <div v-if="item.namespace" class="doc-header__ns">
           {{ item.namespace }}\{{ item.shortName }}
@@ -46,7 +51,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import DocViewer from '../components/DocViewer.vue'
-import { findItem, getItemFileRefs, getItemModifier, getItemIsConditional } from '../utils/sdk.js'
+import { findItem, getItemFileRefs, getItemModifier, getItemIsConditional, getItemIsContract, getItemParams, getItemReturn, renderSignatureHtml } from '../utils/sdk.js'
 
 const { t } = useI18n()
 
@@ -67,4 +72,10 @@ const item = computed(() => findItem(props.type, normalizedPath.value))
 const fileRefs = computed(() => getItemFileRefs(props.type, normalizedPath.value))
 const modifier = computed(() => getItemModifier(props.type, normalizedPath.value))
 const isConditional = computed(() => getItemIsConditional(props.type, normalizedPath.value))
+const isContract = computed(() => getItemIsContract(props.type, normalizedPath.value))
+const params = computed(() => getItemParams(props.type, normalizedPath.value))
+const returnType = computed(() => getItemReturn(props.type, normalizedPath.value))
+const signatureHtml = computed(() =>
+  item.value ? renderSignatureHtml(item.value.shortName, params.value, returnType.value) : ''
+)
 </script>
