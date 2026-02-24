@@ -46,6 +46,7 @@
               <th>{{ t('doc.members.name') }}</th>
               <th>{{ t('doc.members.modifier') }}</th>
               <th>{{ t('doc.members.static') }}</th>
+              <th>{{ t('doc.members.abstract') }}</th>
               <th>{{ t('doc.members.description') }}</th>
             </tr>
           </thead>
@@ -54,6 +55,7 @@
               <td class="doc-members__name"><code v-html="renderSignatureHtml(func.name, func.params, func.return)"></code></td>
               <td class="doc-members__icon" v-html="modifierHtml(func.modifier)"></td>
               <td class="doc-members__icon" v-html="staticHtml(func.static)"></td>
+              <td class="doc-members__icon" v-html="abstractHtml(func.abstract)"></td>
               <td v-html="func.doc ? renderPhpDocDesc(func.doc) : ''"></td>
             </tr>
           </tbody>
@@ -214,6 +216,11 @@ const SVG_STATIC = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" 
   <text x="16" y="8" fill="white" font-size="7" font-family="Arial" font-weight="bold">S</text>
 </svg>`
 
+const SVG_ABSTRACT = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="abstract">
+  <rect x="2" y="2" width="20" height="20" rx="4" fill="#0284c7"/>
+  <text x="5" y="17" fill="white" font-size="13" font-family="Arial" font-weight="bold" font-style="italic">A</text>
+</svg>`
+
 function modifierHtml(modifier) {
   if (modifier === 'protected') return SVG_PROTECTED
   return escapeHtml(modifier ?? '')
@@ -221,6 +228,10 @@ function modifierHtml(modifier) {
 
 function staticHtml(isStatic) {
   return isStatic ? SVG_STATIC : ''
+}
+
+function abstractHtml(isAbstract) {
+  return isAbstract ? SVG_ABSTRACT : ''
 }
 
 const members = computed(() => {

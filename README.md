@@ -341,6 +341,7 @@ Dictionnaire des methodes de la classe, indexe par le **nom de la methode** (san
 | params   | array   | Non | Liste des parametres                       |
 | return   | string  | Non | Type de retour PHP                         |
 | static   | bool    | Non | true si methode statique                   |
+| abstract | bool    | Non | true si methode abstraite.                 |
 +----------+---------+-----+--------------------------------------------+
 ```
 
@@ -494,7 +495,7 @@ Les fonctions globales sont definies comme **cles ordinaires** a la racine du fi
 +----------+--------+-----+----------------------------------------------+
 ```
 
-> Note : Les fonctions globales n'ont pas de `modifier` ni de `static`, contrairement aux methodes.
+> Note : Les fonctions globales n'ont pas de `modifier` ni de `static`, ni de `abstract` contrairement aux methodes.
 
 ---
 
@@ -788,6 +789,7 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 | params   | array  | Non | Liste des parametres (voir section 10.1)     |
 | return   | string | Non | Type PHP de retour                           |
 | static   | bool   | Non | true si methode statique                     |
+| abstract | bool   | Non | true si methode est abstraite                |
 +----------+--------+-----+----------------------------------------------+
 ```
 

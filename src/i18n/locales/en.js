@@ -47,6 +47,7 @@ export default {
       name: 'Name',
       modifier: 'Modifier',
       static: 'Static',
+      abstract: 'Abstract',
       description: 'Description',
     },
   },
