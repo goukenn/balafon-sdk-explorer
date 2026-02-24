@@ -204,6 +204,11 @@ function renderPhpDocDesc(docString) {
 
 // ─── Member icons ──────────────────────────────────────────────────────────
 
+const SVG_PUBLIC = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="public">
+  <circle cx="12" cy="12" r="10" fill="#22c55e"/>
+  <text x="5" y="17" fill="white" font-size="11" font-family="Arial" font-weight="bold">P</text>
+</svg>`
+
 const SVG_PROTECTED = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="protected">
   <path d="M12 4L20 12L12 20L4 12L12 4Z" fill="#FFC107"/>
   <path d="M10 9L9 15M15 9L14 15M8 11H16M7 13H15" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
@@ -222,6 +227,7 @@ const SVG_ABSTRACT = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none
 </svg>`
 
 function modifierHtml(modifier) {
+  if (modifier === 'public') return SVG_PUBLIC
   if (modifier === 'protected') return SVG_PROTECTED
   return escapeHtml(modifier ?? '')
 }
