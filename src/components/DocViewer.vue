@@ -1,5 +1,20 @@
 <template>
   <div>
+    <!-- Definition selector (shown only when multiple definitions exist) -->
+    <div v-if="definitions.length > 1" class="doc-defs">
+      <button
+        v-for="(def, idx) in definitions"
+        :key="idx"
+        class="doc-defs__btn"
+        :class="{ active: idx === selectedDefIdx }"
+        @click="selectedDefIdx = idx"
+      >
+        {{ defLabel(def, idx) }}
+        <span v-if="def.modifier" class="doc-defs__modifier" :class="`badge--${def.modifier}`">{{ def.modifier }}</span>
+        <span v-if="def.is_conditional" class="doc-defs__modifier badge--conditional">conditional</span>
+      </button>
+    </div>
+
     <div v-if="loading" class="doc-loading">
       <span class="spinner"></span>
       <span>{{ t('doc.loading') }}</span>
@@ -76,7 +91,7 @@ import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
 import { useLang } from '../composables/useLang.js'
 import { useSdk } from '../composables/useSdk.js'
-import { getItemDoc, getItemMembers } from '../utils/sdk.js'
+import { getItemDefinitions } from '../utils/sdk.js'
 
 const { t } = useI18n()
 
@@ -95,6 +110,22 @@ const loading = ref(false)
 const content = ref(null)
 const isMd = ref(false)
 const renderedMd = ref('')
+
+// ─── Definition picker ─────────────────────────────────────────────────────
+
+const selectedDefIdx = ref(0)
+
+const definitions = computed(() => getItemDefinitions(props.type, props.path, lang.value))
+
+// Reset selection when navigating to a different item or switching SDK
+watch(() => [props.type, props.path, currentSdkId.value], () => { selectedDefIdx.value = 0 })
+
+const currentDef = computed(() => definitions.value[selectedDefIdx.value] ?? definitions.value[0] ?? null)
+
+function defLabel(/** @type {any} */ def, /** @type {number} */ idx) {
+  if (def.fileRef) return def.fileRef.split('/').pop() ?? def.fileRef
+  return `#${idx + 1}`
+}
 
 // ─── PHPDoc inline fallback ────────────────────────────────────────────────
 
@@ -157,7 +188,7 @@ function renderPhpDoc(docString) {
 }
 
 const phpDocHtml = computed(() => {
-  const docStr = getItemDoc(props.type, props.path, lang.value)
+  const docStr = currentDef.value?.doc
   return docStr ? renderPhpDoc(docStr) : null
 })
 
@@ -192,7 +223,11 @@ function staticHtml(isStatic) {
   return isStatic ? SVG_STATIC : ''
 }
 
-const members = computed(() => getItemMembers(props.type, props.path, lang.value))
+const members = computed(() => {
+  const def = currentDef.value
+  if (!def || (!def.funcs && !def.props)) return null
+  return { funcs: def.funcs, props: def.props }
+})
 
 // Convert a member dict to a sorted array: non-static α first, then static α
 function sortMembers(/** @type {Record<string,any>|null} */ dict) {
@@ -307,6 +342,47 @@ watch(() => [props.type, props.path, lang.value, currentSdkId.value], loadDoc)
 </script>
 
 <style scoped>
+/* ─── Definition picker ─── */
+.doc-defs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 1.25rem;
+}
+.doc-defs__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  outline: none;
+}
+.doc-defs__btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.doc-defs__btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--sidebar-active-bg);
+  font-weight: 600;
+}
+.doc-defs__modifier {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
 .doc-members {
   margin-top: 2rem;
 }

@@ -161,6 +161,29 @@ export function findItem(type, path) {
   return { fullName, shortName, namespace, path, type }
 }
 
+// Return true when the item has exactly one definition and it is marked is_conditional.
+export function getItemIsConditional(type, path) {
+  const fullName = pathToName(path)
+  const dict = /** @type {Record<string, any>} */ (getRawDict(type))
+  const val = dict[fullName]
+  if (!val || typeof val !== 'object') return false
+  if (Array.isArray(val)) return val.length === 1 ? !!val[0].is_conditional : false
+  return !!val.is_conditional
+}
+
+// Return the modifier ("final" | "abstract" | ...) of an item, or null.
+// Only returns a value when there is exactly one definition (ambiguous otherwise).
+export function getItemModifier(type, path) {
+  const fullName = pathToName(path)
+  const dict = /** @type {Record<string, any>} */ (getRawDict(type))
+  const val = dict[fullName]
+  if (!val || typeof val !== 'object') return null
+  if (Array.isArray(val)) {
+    return val.length === 1 ? (val[0].modifier ?? null) : null
+  }
+  return val.modifier ?? null
+}
+
 // Pick the best doc string from an entry for the given language.
 // Looks for "doc.{lang}" first (e.g. "doc.fr"), falls back to "doc".
 // If entry is an array (multiple definitions per ::files), picks the first one that has a doc.
@@ -188,27 +211,40 @@ export function getItemDoc(type, path, lang = 'en') {
   return pickDoc(val, lang)
 }
 
-// Return { funcs, props } for a class/interface/trait entry, or null if neither is present.
-// Each member's "doc" field is resolved to the best available language string.
-export function getItemMembers(type, path, lang = 'en') {
+// Return all definitions for an item as a normalized array.
+// Each definition: { fileRef, is_conditional, doc, funcs, props }
+// Member docs are resolved for the given language.
+// Single-object entries are wrapped in a one-element array for uniformity.
+export function getItemDefinitions(type, path, lang = 'en') {
   const fullName = pathToName(path)
   const dict = /** @type {Record<string, any>} */ (getRawDict(type))
   const val = dict[fullName]
-  if (!val || typeof val !== 'object') return null
-  const rawFuncs = (val.funcs && typeof val.funcs === 'object' && !Array.isArray(val.funcs)) ? val.funcs : null
-  const rawProps = (val.props && typeof val.props === 'object' && !Array.isArray(val.props)) ? val.props : null
-  if (!rawFuncs && !rawProps) return null
+  if (!val || typeof val !== 'object') return []
+  const entries = Array.isArray(val) ? val : [val]
 
   function normalizeMember(/** @type {any} */ member) {
     if (!member || typeof member !== 'object') return member
     return { ...member, doc: pickDoc(member, lang) }
   }
 
-  const funcs = rawFuncs
-    ? Object.fromEntries(Object.entries(rawFuncs).map(([k, v]) => [k, normalizeMember(v)]))
-    : null
-  const props = rawProps
-    ? Object.fromEntries(Object.entries(rawProps).map(([k, v]) => [k, normalizeMember(v)]))
-    : null
-  return { funcs, props }
+  return entries.map(entry => {
+    const rawFuncs = (entry.funcs && typeof entry.funcs === 'object' && !Array.isArray(entry.funcs)) ? entry.funcs : null
+    const rawProps = (entry.props && typeof entry.props === 'object' && !Array.isArray(entry.props)) ? entry.props : null
+    return {
+      fileRef: resolveFileRef(entry),
+      is_conditional: !!entry.is_conditional,
+      modifier: entry.modifier ?? null,
+      doc: pickDoc(entry, lang),
+      funcs: rawFuncs ? Object.fromEntries(Object.entries(rawFuncs).map(([k, v]) => [k, normalizeMember(v)])) : null,
+      props: rawProps ? Object.fromEntries(Object.entries(rawProps).map(([k, v]) => [k, normalizeMember(v)])) : null,
+    }
+  })
+}
+
+// Return { funcs, props } for a single definition (by index, default 0).
+export function getItemMembers(type, path, lang = 'en', defIndex = 0) {
+  const defs = getItemDefinitions(type, path, lang)
+  const def = defs[defIndex] ?? defs[0]
+  if (!def || (!def.funcs && !def.props)) return null
+  return { funcs: def.funcs, props: def.props }
 }

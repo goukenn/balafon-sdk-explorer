@@ -15,6 +15,8 @@
         <h1>
           {{ item.shortName }}
           <span class="doc-header__badge" :class="`badge--${type}`">{{ typeLabel }}</span>
+          <span v-if="modifier" class="doc-header__badge" :class="`badge--${modifier}`">{{ modifier }}</span>
+          <span v-if="isConditional" class="doc-header__badge badge--conditional">conditional</span>
         </h1>
 
         <div v-if="item.namespace" class="doc-header__ns">
@@ -44,7 +46,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import DocViewer from '../components/DocViewer.vue'
-import { findItem, getItemFileRefs } from '../utils/sdk.js'
+import { findItem, getItemFileRefs, getItemModifier, getItemIsConditional } from '../utils/sdk.js'
 
 const { t } = useI18n()
 
@@ -63,4 +65,6 @@ const typeLabel = computed(() => t(`types.${props.type}`) || props.type)
 
 const item = computed(() => findItem(props.type, normalizedPath.value))
 const fileRefs = computed(() => getItemFileRefs(props.type, normalizedPath.value))
+const modifier = computed(() => getItemModifier(props.type, normalizedPath.value))
+const isConditional = computed(() => getItemIsConditional(props.type, normalizedPath.value))
 </script>
