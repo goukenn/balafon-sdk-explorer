@@ -774,7 +774,7 @@ Certaines fonctions conditionnelles peuvent ne pas avoir de namespace :
 | doc      | Non   | Non   | Non     | Bloc PHPDoc                                  |
 | modifier | Non   | -     | -       | "abstract" ou "final"                        |
 | funcs    | Non   | Non   | Non     | Methodes definies                            |
-| props    | Non   | -     | Non     | Proprietes PHP                               |
+| props    | Non   | -     | Non     | Proprieté PHP                               |
 +----------+-------+-------+---------+----------------------------------------------+
 ```
 
